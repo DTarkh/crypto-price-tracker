@@ -1,14 +1,9 @@
-
-import './App.css'
+import "./App.css";
 
 function App() {
-
-
-  return (
-    <>
-    
-    </>
-  )
+  return <>
+  <h2 className="text-red-600">fefe</h2>
+  </>;
 }
 
-export default App
+export default App;
