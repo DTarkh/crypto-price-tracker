@@ -34,9 +34,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="h-screen p-6">
       <Header />
-      <SelectCoin handleAddCoin={handleAddCoin} />
+      <SelectCoin handleAddCoin={handleAddCoin} selectedCoins={selectedCoins}/>
       <DisplayTickers
         selectedCoins={selectedCoins}
         handleRemoveCoin={handleRemoveCoin}
