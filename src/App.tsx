@@ -10,7 +10,7 @@ function App() {
 
   const handleAddCoin = (symbol: string) => {
     if (!selectedCoins.includes(symbol)) {
-      setSelectedCoins((prev) => [...prev, symbol]);
+      setSelectedCoins((prev) => [symbol, ...prev]);
     }
 
     const existingTickers = JSON.parse(localStorage.getItem("ticker") ?? "[]");
