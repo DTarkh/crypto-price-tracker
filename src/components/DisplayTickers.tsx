@@ -17,7 +17,7 @@ export default function DisplayTickers({
           <CoinTicker symbol={coin} />
           <button
             onClick={() => handleRemoveCoin(coin)}
-            className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition hover:cursor-pointer"
+            className="absolute top-4 -right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition hover:cursor-pointer"
             title="Remove"
           >
             ✖

@@ -14,13 +14,13 @@ export default function SelectCoin({ handleAddCoin, selectedCoins }: Props) {
   ];
 
   return (
-    <div className="flex flex-wrap justify-center gap-4 mb-10">
+    <div className="flex flex-wrap justify-center gap-4 mb-7">
       {availableCoins.map((coin: string) => {
-        let clss = "px-4 py-2 text-white rounded-lg hover:bg-blue-600 transition hover:cursor-pointer";
+        let clss = "px-4 py-2 text-stone-200 rounded-lg hover:bg-stone-800 transition hover:cursor-pointer";
         if (selectedCoins.includes(coin)){
           clss += " bg-red-600" 
         } else {
-          clss += " bg-black"
+          clss += " bg-stone-950"
         }
           
           return (
