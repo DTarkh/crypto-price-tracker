@@ -15,48 +15,54 @@ type MiniTicker = {
 export function useBinanceMiniTicker(symbol: string) {
   const [ticker, setTicker] = useState<MiniTicker | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<number | null>(null);
-
-  const connectWebSocket = () => {
-    wsRef.current = new WebSocket('wss://stream.binance.com:9443/ws/!miniTicker@arr');
-
-    wsRef.current.onopen = () => {
-      console.log('WebSocket connected ✅');
-    };
-
-    wsRef.current.onmessage = (event: MessageEvent) => {
-      try {
-        const data: MiniTicker[] = JSON.parse(event.data);
-        const coinData = data.find((item) => item.s === symbol.toUpperCase());
-        if (coinData) {
-          setTicker(coinData);
-        }
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
-    };
-
-    wsRef.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      wsRef.current?.close();
-    };
-
-    wsRef.current.onclose = (event: CloseEvent) => {
-      console.warn('WebSocket closed. Attempting to reconnect...', event.reason);
-      reconnectTimeoutRef.current = window.setTimeout(() => {
-        connectWebSocket();
-      }, 3000);
-    };
-  };
+  const reconnectRef = useRef<number | null>(null);
 
   useEffect(() => {
-    connectWebSocket();
+    let isAlive = true;    // ← are we still “in business”?
+
+    const connect = () => {
+      // 👇 switch to single‐symbol stream for lighter traffic:
+      const url = `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@miniTicker`;
+      const ws = new WebSocket(url);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        console.log('WS open:', url);
+      };
+
+      ws.onmessage = (evt) => {
+        try {
+          const data: MiniTicker = JSON.parse(evt.data);
+          setTicker(data);
+        } catch (e) {
+          console.error('parse error', e);
+        }
+      };
+
+      ws.onerror = (err) => {
+        console.error('WS error', err);
+        // You can ws.close() here if you want to treat errors as closures
+      };
+
+      ws.onclose = (evt) => {
+        console.warn('WS closed', evt.code, evt.reason);
+        // only reconnect if we didn’t explicitly tear it down
+        if (isAlive && evt.code !== 1000 /* 1000 = “normal closure” */) {
+          reconnectRef.current = window
+            .setTimeout(connect, 3000);
+        }
+      };
+    };
+
+    connect();
 
     return () => {
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
+      // tell onclose not to reconnect, and clear any pending timer
+      isAlive = false;
+      if (reconnectRef.current) {
+        clearTimeout(reconnectRef.current);
       }
-      wsRef.current?.close();
+      wsRef.current?.close(1000);  // code 1000 = “normal closure”
     };
   }, [symbol]);
 
